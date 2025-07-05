@@ -17,10 +17,14 @@ import * as core from "@actions/core";
  *
  * @param version expected version of Terraform
  */
-async function checkVersionAvailability(version: string): Promise<boolean> {
+async function checkVersionAvailability(
+  version: string,
+  workingDirectory: string
+): Promise<boolean> {
   try {
     const terraformVersion = JSON.parse(
       execSync("terraform version -json", {
+        cwd: workingDirectory,
         encoding: "utf8",
         // Don't print out error if command is not found
         stdio: "pipe",
@@ -43,8 +47,11 @@ async function checkVersionAvailability(version: string): Promise<boolean> {
   }
 }
 
-export async function ensureTerraform(version: string) {
-  if (!(await checkVersionAvailability(version))) {
+export async function ensureTerraform(
+  version: string,
+  workingDirectory: string
+) {
+  if (!(await checkVersionAvailability(version, workingDirectory))) {
     throw new Error(
       `Terraform not installed, please use the setup-terraform action with the specified version to install terraform. You can find it at github.com/hashicorp/setup-terraform`
     );

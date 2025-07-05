@@ -77,7 +77,8 @@ async function execute(
   ) => Promise<void>
 ): Promise<void> {
   core.debug(`Checking if terraform is installed`);
-  await ensureTerraform(inputs.terraformVersion);
+  const workingDirectory = inputs.workingDirectory || process.cwd();
+  await ensureTerraform(inputs.terraformVersion, workingDirectory);
 
   const mainCommand = `${cdktfCommand} ${inputs.cdktfArgs}`;
   const fullCdktfCommand = inputs.customNpxArgs
@@ -88,7 +89,7 @@ async function execute(
   let output = "";
   try {
     await exec(fullCdktfCommand, [], {
-      cwd: inputs.workingDirectory || process.cwd(),
+      cwd: workingDirectory,
       env: {
         ...process.env,
         FORCE_COLOR: "0", // disable chalk terminal colors
